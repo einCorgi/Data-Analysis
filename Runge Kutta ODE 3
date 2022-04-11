@@ -1,0 +1,71 @@
+import math
+import numpy as np
+import matplotlib.pyplot as plt
+
+def runge_kutta_2(xn, yn, dyn, dx, f):
+    
+    """ yn es el valor inicial de y
+    xn es el valor inicial de x
+    dx is the time step in x
+    f es la derivada de y(x)
+    """
+
+    k1 = dx * dyn #k es para y
+    l1 = dx * f(xn,yn,dyn) #l es para y'
+    k2 = dx * (dyn + 0.5*l1)
+    l2 = dx * f(xn + 0.5*dx, yn + 0.5*k1, dyn +0.5*l1)
+    k3 = dx * (dyn + 0.5*l2)
+    l3 = dx * f(xn + 0.5*dx, yn + 0.5*k2, dyn +0.5*l2)
+    k4 = dx * (dyn + l3)
+    l4 = dx * f(xn + dx, yn + k3, dyn + l3)
+    yn1 = yn + (k1 + 2*k2 + 2*k3 + k4)/6.
+    dyn1 = dyn + (l1 + 2*l2 + 2*l3 + l4)/6.
+    return [yn1,dyn1]
+
+def runge_kutta(xn, yn, dx, f):
+    
+    """ yn es el valor inicial de y
+    xn es el valor inicial de x
+    dx is the time step in x
+    f es la derivada de y(x)
+    """
+    k1 = dx * f(xn, yn)
+    k2 = dx * f(xn + 0.5 * dx, yn + 0.5 * k1)
+    k3 = dx * f(xn + 0.5 * dx, yn + 0.5 * k2)
+    k4 = dx * f(x + dx, y + k3)
+    return yn + (k1 + 2 * k2 + 2 * k3 + k4) / 6.
+
+def Derivada(x, y): #ec 6.18 despejada en X´´ (o sea y')
+    
+    Beta = 1 #modificar
+    return -(5)**2 * x - 2 * Beta * y
+
+def Derivada_2(x, y, dy): #No usar por ahora
+    
+    return 5*dy - 2*y + 4*x +8
+
+
+x0 = 0.0 #Valor iniciarl de X
+y0 = 1.0 # Valor inicial de y(x)
+dy0 = 0.0 #Valor inicial de y'(x)
+dx = 0.1 #paso deseado
+
+ys, xs = [], []
+
+y=y0
+dy=dy0
+x=x0
+
+while x <= 10:
+    #[y,dy] = runge_kutta_2(x, y, dy, dx, Derivada_2) no usar por ahora
+    y = runge_kutta(x, y, dx, Derivada)
+    x = x + dx
+    ys.append(y)
+    xs.append(x)
+
+''' Prueba con ecuaciones reales '''
+Yexacta = [(2*x + (-4-18/np.sqrt(17))*np.exp(-0.5*(np.sqrt(17)-5)*x) + (-4+18/np.sqrt(17))*np.exp(0.5*(np.sqrt(17)+5)*x) +9) for x in xs]
+plt.plot(xs, ys, label='runge_kutta')
+plt.plot(xs, Yexacta, label='exacta')
+plt.legend()
+plt.show()
